@@ -1,0 +1,1 @@
+web: gunicorn Dynamic_tables.wsgi
