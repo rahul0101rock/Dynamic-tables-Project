@@ -6,12 +6,16 @@ import psycopg2
 
 def home(request):
     return render(request,'Dtables/home.html',{})
+
+
 def create_table(request):
     data={}
     no_col=1
     if request.method == 'POST':
         if 'no_col' in request.POST:
             no_col=int(request.POST['no_col'])
+            if no_col<1:
+                no_col=1
         elif 'create' in request.POST:
             table=request.POST
             cq = "CREATE TABLE "+ request.POST["table_name"] + " ( "
@@ -32,7 +36,6 @@ def create_table(request):
                     cq+=", "
             cq=cq[:-2]+");"
 
-
             try:
                 conn = psycopg2.connect(
                         host="ec2-44-199-52-133.compute-1.amazonaws.com",
@@ -45,12 +48,12 @@ def create_table(request):
                 desc="SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';"
                 cur.execute(desc)
                 data["data"]= cur.fetchall()
+                data["data_tablename"]=request.POST["table_name"].lower()
                 cur.close()
                 conn.commit()
             except (Exception, psycopg2.DatabaseError) as error:
-                data["error"]=str(error)
+                data["error"]=str(error).replace("relation","Table")
                 conn.rollback()
-
             finally:
                 if conn is not None:
                     conn.close()

@@ -49,7 +49,26 @@ Create Table
     </div>
 </div>
 <h3 class="text-danger text-center">{{error}}</h3>
-<h3 class="text-center">{{data}}</h3>
+{% if data%}
+    <h3 class="text-success text-center">Table "{{data_tablename}}" Created Successfully</h3>
+    <table class="table table-bordered mx-auto" style="max-width: 50%">
+        <thead>
+            <tr>
+                <th>Column Name</th>
+                <th>Data type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for x in data %}
+            <tr>
+                {% for i in x %}
+                    <td>{{i}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
 
 <script type="text/javascript">
     $(function(){
