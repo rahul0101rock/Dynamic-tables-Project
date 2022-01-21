@@ -10,7 +10,7 @@ def create_table(request):
     data={}
     no_col=1
     if request.method == 'POST':
-        if 'addcol' in request.POST:
+        if 'no_col' in request.POST:
             no_col=int(request.POST['no_col'])
         elif 'create' in request.POST:
             table=request.POST
