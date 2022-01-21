@@ -4,11 +4,37 @@ Create Table
 {% endblock %}
 
 {% block content %}
-<form method ="POST"class="mx-2 my-2">
+<form method ="POST" class="mx-2 my-2 ">
     {% csrf_token %}
-    <input type="text" class="form-control" name="query">
-    <button class="btn btn-success my-2"> Run </button>
+    <input type="number" maxlength="2" size="2" name="no_col" value="{{no_col}}">
+    <button class="btn btn-warning my-2 col-auto" name="addcol"> Set Columns </button>
+    <br>
 </form>
-{{q}}<br>
-{{data}}
+<form method ="POST" class="mx-2 my-2 ">
+    {% csrf_token %}
+    <div class="row mx-1">
+    Table name
+    <input type="text" class="col-auto mx-2 col-4" name="table_name"><br>
+    </div>
+    {% for i in range_col %}
+    Column {{i}}
+    <div class="row mx-2">
+        Name
+        <input type="text" class="col-auto mx-2" name="n{{i}}" required>
+        Datatype
+        <select class="col-auto mx-2" name="d{{i}}" required>
+            <option value="String">String</option>
+            <option value="Number">Number</option>
+            <option value="Boolean">Boolean</option>
+            <option value="Email">Email</option>
+            <option value="Datetime">Datetime</option>
+        </select>
+        Primary Key
+        <input type="radio" class="col-aut form-check-input mx-2" name="primary" value={{i}} required>
+    </div>
+    {% endfor %}
+    <button class="btn btn-success my-2 col-auto" name="create"> Create </button>
+</form>
+<h3 class="text-danger">{{error}}</h3>
+<h3>{{data}}</h3>
 {% endblock %}
