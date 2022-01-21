@@ -17,6 +17,16 @@ def create_table(request):
     if request.method == 'POST':
         q = request.POST['query']
         data["q"]=q
+        if len(q)!=0:
+            try:
+                cur = conn.cursor()
+                cur.execute(q)
+                if q[:6].lower()=="select":
+                    data["data"]= cur.fetchall()
+                cur.close()
+                conn.commit()
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
     return render(request,'Dtables/create_table.html',data)
 
 def user_login(request):
