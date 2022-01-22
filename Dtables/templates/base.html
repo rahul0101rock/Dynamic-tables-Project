@@ -27,9 +27,18 @@
         </button>
         <div class="collapse navbar-collapse" id="navdata">
             <ul class="navbar-nav ms-auto mx-4">
-                <li class="nav-item mx-2">
-                    <a class="nav-link btn text-secondary" href="/login">Login <i class="fa fa-sign-in"></i></a>
+                {% if user.is_authenticated %}
+                <li class="nav-item text-white ">
+                    <div class="nav-link btn"><i class="fa fa-user-o"></i> {{ request.user }}</div>
                 </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link btn" href="/logout">Logout <i class="fa fa-sign-out"></i></a>
+                </li>
+                {% else%}
+                <li class="nav-item mx-2">
+                    <a class="nav-link btn" href="/login/auth0">Login <i class="fa fa-sign-in"></i></a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </nav>

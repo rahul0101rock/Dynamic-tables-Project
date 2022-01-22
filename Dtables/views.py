@@ -1,5 +1,9 @@
 import imp
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout as log_out
+from django.conf import settings
+from django.http import HttpResponseRedirect
+from urllib.parse import urlencode
 import psycopg2
 # Create your views here.
 
@@ -11,17 +15,21 @@ conn = psycopg2.connect(
                 password="74d44525601b94c94852911426fddfc4f0a3fb28d30c3c2db4aafbaf03b0c235")
 
 def home(request):
-    data={}
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
-        data["alltables"]= [x[0] for x in cur.fetchall()]
-        cur.close()
-        conn.commit()
-    except (Exception, psycopg2.DatabaseError) as error:
-        data["error"]=str(error)
-        conn.rollback()
-    return render(request,'Dtables/home.html',data)
+    user = request.user
+    if user.is_authenticated:
+        data={}
+        try:
+            cur = conn.cursor()
+            cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
+            data["alltables"]= [x[0] for x in cur.fetchall()]
+            cur.close()
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            data["error"]=str(error)
+            conn.rollback()
+        return render(request,'Dtables/home.html',data)
+    else:
+        return render(request,'Dtables/index.html',{})
 
 
 def create_table(request):
@@ -90,8 +98,9 @@ def delete_table(request):
         conn.rollback()
     return render(request,'Dtables/delete_table.html',data)
 
-def user_login(request):
-    return render(request,'Dtables/login.html',{})
-
-def user_signup(request):
-    return render(request,'Dtables/signup.html',{})
+def user_logout(request):
+    log_out(request)
+    return_to = urlencode({'returnTo': request.build_absolute_uri('/')})
+    logout_url = 'https://%s/v2/logout?client_id=%s&%s' % \
+                 (settings.SOCIAL_AUTH_AUTH0_DOMAIN, settings.SOCIAL_AUTH_AUTH0_KEY, return_to)
+    return HttpResponseRedirect(logout_url)

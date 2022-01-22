@@ -28,10 +28,26 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
+SOCIAL_AUTH_AUTH0_DOMAIN = 'dev-9yj3yt0w.us.auth0.com'
+SOCIAL_AUTH_AUTH0_KEY = '9hwWwAyotfIYzzeo3GzkYiRAvuBQXoPk'
+SOCIAL_AUTH_AUTH0_SECRET = '_gHWPzxq2FObHLkEEct_HXSRyClR9yvYBOJ50jqUfAufbNI2Tc8oNpU9nmq7o8wZ'
 
+SOCIAL_AUTH_AUTH0_SCOPE = [
+    'openid',
+    'profile',
+    'email'
+]
+AUTHENTICATION_BACKENDS = {
+    'Dtables.auth0backend.Auth0',
+    'django.contrib.auth.backends.ModelBackend'
+}
+LOGIN_URL = '/login/auth0'
+LOGIN_REDIRECT_URL = '/'
 # Application definition
 
 INSTALLED_APPS = [
+    'social_django',
     'Dtables.apps.DtablesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
