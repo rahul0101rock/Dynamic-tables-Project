@@ -45,6 +45,15 @@ Home
                 <div class="card border-secondary mb-3" style="max-width: 100%; height:100%;">
                     <div class="card-header text-center text-primary"><b>View Tables</b></div>
                     <div class="card-body text-secondary">
+                        <ul>
+                            {% for t in alltables%}
+                                <li>
+                                    {{t}}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        
+                        {{error}}
                     </div>
                   </div>
             </div>

@@ -5,7 +5,26 @@ import psycopg2
 
 
 def home(request):
-    return render(request,'Dtables/home.html',{})
+    data={}
+    try:
+        conn = psycopg2.connect(
+                host="ec2-44-199-52-133.compute-1.amazonaws.com",
+                database="d3cghqvqk02ucg",
+                user="fpgmhtjqlwixcj",
+                port="5432",
+                password="34a96669eff5909572740d2860fbfeac7bf1646f4e7994988b66a0acf7a779be")
+        cur = conn.cursor()
+        cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
+        data["alltables"]= [x[0] for x in cur.fetchall()]
+        cur.close()
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        data["error"]=str(error)
+        conn.rollback()
+    finally:
+        if conn is not None:
+            conn.close()
+    return render(request,'Dtables/home.html',data)
 
 
 def create_table(request):
@@ -45,8 +64,8 @@ def create_table(request):
                         password="34a96669eff5909572740d2860fbfeac7bf1646f4e7994988b66a0acf7a779be")
                 cur = conn.cursor()
                 cur.execute(cq)
-                desc="SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';"
-                cur.execute(desc)
+                cur.execute("INSERT INTO alltables (table_name, username) VALUES ('"+request.POST["table_name"].lower()+"', 'NA');")
+                cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
                 data["data"]= cur.fetchall()
                 data["data_tablename"]=request.POST["table_name"].lower().title()
                 cur.close()
@@ -73,8 +92,14 @@ def delete_table(request):
                     port="5432",
                     password="34a96669eff5909572740d2860fbfeac7bf1646f4e7994988b66a0acf7a779be")
             cur = conn.cursor()
-            cur.execute("DROP TABLE "+request.POST["table_name"].lower()+";")
-            data["message"]='Table "'+request.POST["table_name"].lower().title()+'" Successfully Deleted'
+            cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
+            tables=[x[0] for x in cur.fetchall()]
+            if request.POST["table_name"].lower() in tables:
+                cur.execute("DROP TABLE "+request.POST["table_name"].lower()+";")
+                cur.execute("DELETE FROM alltables Where table_name = '"+request.POST["table_name"].lower()+"';")
+                data["message"]='Table "'+request.POST["table_name"].lower().title()+'" Successfully Deleted'
+            else:
+                data["error"]='Table "'+request.POST["table_name"].lower().title()+'" Does Not Exist'
             cur.close()
             conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
