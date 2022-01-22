@@ -4,45 +4,61 @@ Create Table
 {% endblock %}
 
 {% block content %}
-<br><br>
-<div class="card border-dark mb-3 mx-auto" style="max-width: 50%">
-    <div class="card-header"><h2 class="text-center">Create Table</h2></div>
+<div class="card border-success mb-3 mx-auto my-5" style="max-width: 50%">
+    <div class="card-header"><h2 class="text-center text-success">Create Table</h2></div>
     <div class="card-body">
-        <div class="row offset-md-2">
-            <div class="h4 col">Number of Columns</div>
+        <div class="row mx-auto" style="max-width: 50%">
+            <div class="h4 col-auto text-secondary">Number of Columns</div>
             <form method ="POST" class="col" id="change_col" name="change_col">
                 {% csrf_token %}
-                <input type="number" maxlength="2" size="2" id="no_col" name="no_col" value="{{no_col}}">
+                <input type="number" class="form-control" maxlength="2" size="2" id="no_col" name="no_col" value="{{no_col}}">
                 <br>
             </form>
         </div>
-        <hr>
         <form method ="POST" class="my-2">
             {% csrf_token %}
-            <div class="row offset-md-2">
-            <div class="h4 col-3">Table name</div>
-            <input type="text" class="col-7" name="table_name"><br>
+            <div class="row mx-auto" style="max-width: 70%">
+            <div class="h4 text-secondary col-auto ">Table name</div>
+            <input type="text" class="col form-control" name="table_name"><br>
             </div>
-            <hr>
-            {% for i in range_col %}
-            <div class="row my-2 mx-2">
-                <b class="col">Column {{i}}</b>
-                Name
-                <input type="text" class="col-auto mx-2" name="n{{i}}" required>
-                Datatype
-                <select class="col-auto mx-2" name="d{{i}}" required>
-                    <option value="String">String</option>
-                    <option value="Number">Number</option>
-                    <option value="Boolean">Boolean</option>
-                    <option value="Email">Email</option>
-                    <option value="Datetime">Datetime</option>
-                </select>
-                Primary Key
-                <input type="radio" class="col-auto form-check-input mx-2" name="primary" value="{{i}}" required>
-            </div>
-            {% endfor %}
-            <hr>
-            <div class="text-center"><button class="btn btn-success my-2 py-2 px-4" name="create">Create Table</button></div>
+            <table class="table table-hover my-4">
+                <thead>
+                    <tr class="text-center">
+                        <th>#</th>
+                        <th>Column Name</th>
+                        <th>Column Datatype</th>
+                        <th>Primary Key</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range_col %}
+                    <tr class="text-center">
+                        <td>
+                            <b class="col">Column {{i}}</b>
+                        </td>
+                        <td>
+                            <input type="text" class="col-auto form-control" name="n{{i}}" required>
+                        </td>
+                        <td>
+                            <select class="col-auto form-control" name="d{{i}}" required>
+                                <option value="String">String</option>
+                                <option value="Number">Number</option>
+                                <option value="Boolean">Boolean</option>
+                                <option value="Email">Email</option>
+                                <option value="Datetime">Datetime</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch col-auto">
+                                <input class="form-check-input mx-auto mt-2" type="radio" name="primary" value="{{i}}" required>
+                            </div>
+                        </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table> 
+            <div class="text-center"><button class="btn btn-outline-success my-2 py-2 px-4" name="create"><i class="fa fa-plus"></i> Create Table</button></div>
             
         </form>
 
