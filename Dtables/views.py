@@ -48,11 +48,11 @@ def create_table(request):
                 desc="SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';"
                 cur.execute(desc)
                 data["data"]= cur.fetchall()
-                data["data_tablename"]=request.POST["table_name"].lower()
+                data["data_tablename"]=request.POST["table_name"].lower().title()
                 cur.close()
                 conn.commit()
             except (Exception, psycopg2.DatabaseError) as error:
-                data["error"]=str(error).replace("relation","Table")
+                data["error"]=str(error).replace("relation","Table").title()
                 conn.rollback()
             finally:
                 if conn is not None:
@@ -61,6 +61,29 @@ def create_table(request):
     data["range_col"]=range(1,no_col+1)
     data["no_col"]=no_col
     return render(request,'Dtables/create_table.html',data)
+
+def delete_table(request):
+    data={}
+    if request.method == 'POST':
+        try:
+            conn = psycopg2.connect(
+                    host="ec2-44-199-52-133.compute-1.amazonaws.com",
+                    database="d3cghqvqk02ucg",
+                    user="fpgmhtjqlwixcj",
+                    port="5432",
+                    password="34a96669eff5909572740d2860fbfeac7bf1646f4e7994988b66a0acf7a779be")
+            cur = conn.cursor()
+            cur.execute("DROP TABLE "+request.POST["table_name"].lower()+";")
+            data["message"]='Table "'+request.POST["table_name"].lower().title()+'" Successfully Deleted'
+            cur.close()
+            conn.commit()
+        except (Exception, psycopg2.DatabaseError) as error:
+            data["error"]=str(error).title()
+            conn.rollback()
+        finally:
+            if conn is not None:
+                conn.close()
+    return render(request,'Dtables/delete_table.html',data)
 
 def user_login(request):
     return render(request,'Dtables/login.html',{})
