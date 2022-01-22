@@ -3,16 +3,16 @@ from django.shortcuts import render
 import psycopg2
 # Create your views here.
 
+conn = psycopg2.connect(
+                host="ec2-3-222-49-168.compute-1.amazonaws.com",
+                database="d8iqnsedmjcq38",
+                user="exaawxakfawwqg",
+                port="5432",
+                password="74d44525601b94c94852911426fddfc4f0a3fb28d30c3c2db4aafbaf03b0c235")
 
 def home(request):
     data={}
     try:
-        conn = psycopg2.connect(
-                host="ec2-44-199-52-133.compute-1.amazonaws.com",
-                database="d3cghqvqk02ucg",
-                user="fpgmhtjqlwixcj",
-                port="5432",
-                password="34a96669eff5909572740d2860fbfeac7bf1646f4e7994988b66a0acf7a779be")
         cur = conn.cursor()
         cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
         data["alltables"]= [x[0] for x in cur.fetchall()]
@@ -21,10 +21,8 @@ def home(request):
     except (Exception, psycopg2.DatabaseError) as error:
         data["error"]=str(error)
         conn.rollback()
-    finally:
-        if conn is not None:
-            conn.close()
     return render(request,'Dtables/home.html',data)
+
 
 def create_table(request):
     data={}
@@ -55,12 +53,6 @@ def create_table(request):
             cq=cq[:-2]+");"
 
             try:
-                conn = psycopg2.connect(
-                        host="ec2-44-199-52-133.compute-1.amazonaws.com",
-                        database="d3cghqvqk02ucg",
-                        user="fpgmhtjqlwixcj",
-                        port="5432",
-                        password="34a96669eff5909572740d2860fbfeac7bf1646f4e7994988b66a0acf7a779be")
                 cur = conn.cursor()
                 cur.execute(cq)
                 cur.execute("INSERT INTO alltables (table_name, username) VALUES ('"+request.POST["table_name"].lower()+"', 'NA');")
@@ -72,9 +64,6 @@ def create_table(request):
             except (Exception, psycopg2.DatabaseError) as error:
                 data["error"]=str(error).replace("relation","Table").title()
                 conn.rollback()
-            finally:
-                if conn is not None:
-                    conn.close()
 
     data["range_col"]=range(1,no_col+1)
     data["no_col"]=no_col
@@ -82,31 +71,23 @@ def create_table(request):
 
 def delete_table(request):
     data={}
-    if request.method == 'POST':
-        try:
-            conn = psycopg2.connect(
-                    host="ec2-44-199-52-133.compute-1.amazonaws.com",
-                    database="d3cghqvqk02ucg",
-                    user="fpgmhtjqlwixcj",
-                    port="5432",
-                    password="34a96669eff5909572740d2860fbfeac7bf1646f4e7994988b66a0acf7a779be")
-            cur = conn.cursor()
-            cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
-            tables=[x[0] for x in cur.fetchall()]
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
+        tables=[x[0] for x in cur.fetchall()]
+        data['tables']=tables
+        if request.method == 'POST':
             if request.POST["table_name"].lower() in tables:
                 cur.execute("DROP TABLE "+request.POST["table_name"].lower()+";")
                 cur.execute("DELETE FROM alltables Where table_name = '"+request.POST["table_name"].lower()+"';")
                 data["message"]='Table "'+request.POST["table_name"].lower().title()+'" Successfully Deleted'
             else:
                 data["error"]='Table "'+request.POST["table_name"].lower().title()+'" Does Not Exist'
-            cur.close()
-            conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            data["error"]=str(error).title()
-            conn.rollback()
-        finally:
-            if conn is not None:
-                conn.close()
+        cur.close()
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        data["error"]=str(error).title()
+        conn.rollback()
     return render(request,'Dtables/delete_table.html',data)
 
 def user_login(request):
