@@ -23,7 +23,6 @@ def home(request):
         conn.rollback()
     return render(request,'Dtables/home.html',data)
 
-
 def create_table(request):
     data={}
     no_col=1
