@@ -8,11 +8,11 @@ import psycopg2
 # Create your views here.
 
 conn = psycopg2.connect(
-                host="ec2-3-222-49-168.compute-1.amazonaws.com",
-                database="d8iqnsedmjcq38",
-                user="exaawxakfawwqg",
+                host="ec2-34-194-171-47.compute-1.amazonaws.com",
+                database="ddffht99no2b23",
+                user="uxihixqyaetpsc",
                 port="5432",
-                password="74d44525601b94c94852911426fddfc4f0a3fb28d30c3c2db4aafbaf03b0c235")
+                password="0c9e94b7c928423a19bc8d4fd5de1133e2cb424c82bd5f7c2365c93419b0ddcd")
 
 def home(request):
     user = request.user
