@@ -11,13 +11,11 @@ Delete Table
             {% csrf_token %}
             <div class="row mx-auto" style="max-width: 70%">
                 <div class="h4 text-secondary col-auto ">Table name</div>
-                <input type="text" class="col form-control" name="table_name" list="tables"><br>
-                
-                <datalist id="tables">
+                <select id="tables" name="table_name" class="col form-select">
                     {% for t in tables %}
                         <option value="{{t}}">{{t}}</option>
                     {% endfor %}
-                </datalist>
+                </select> <br>  
             </div>
             <div class="text-center"><button class="btn btn-outline-danger mt-4 py-2 px-4" name="delete"><i class="fa fa-trash"></i> Delete Table</button></div>
         </form>

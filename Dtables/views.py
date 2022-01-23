@@ -89,6 +89,9 @@ def delete_table(request):
                 cur.execute("DROP TABLE "+request.POST["table_name"].lower()+";")
                 cur.execute("DELETE FROM alltables Where table_name = '"+request.POST["table_name"].lower()+"';")
                 data["message"]='Table "'+request.POST["table_name"].lower().title()+'" Successfully Deleted'
+                cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
+                tables=[x[0] for x in cur.fetchall()]
+                data['tables']=tables
             else:
                 data["error"]='Table "'+request.POST["table_name"].lower().title()+'" Does Not Exist'
         cur.close()
@@ -97,6 +100,34 @@ def delete_table(request):
         data["error"]=str(error).title()
         conn.rollback()
     return render(request,'Dtables/delete_table.html',data)
+
+
+def insert_data(request):
+    data={}
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
+        tables=[x[0] for x in cur.fetchall()]
+        data['tables']=tables
+        if request.method == 'POST':
+            if 'insert' in request.POST:
+                d=dict(request.POST)
+                d.pop('csrfmiddlewaretoken')
+                d.pop('insert')
+                data['d']=d
+            cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
+            struct={}
+            for x in cur.fetchall():
+                struct[x[0]]=x[1]
+            data["struct"]=struct
+            cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
+            data["data"]= cur.fetchall()
+        cur.close()
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        data["error"]=str(error).title()
+        conn.rollback()
+    return render(request,'Dtables/insert_data.html',data)
 
 def user_logout(request):
     log_out(request)

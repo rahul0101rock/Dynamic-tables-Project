@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title%}
+Delete Table
+{% endblock %}
+
+{% block content %}
+<div class="card border-primary mb-3 mx-auto my-5" style="max-width: 50%">
+    <div class="card-header"><h2 class="text-center text-primary">Insert Data</h2></div>
+    <div class="card-body">
+        <form method ="POST" class="my-2" id="select_table">
+            {% csrf_token %}
+            <div class="row mx-auto" style="max-width: 70%">
+                <div class="h4 text-secondary col-auto ">Table name</div>
+                <select id="tables" name="table_name" class="col form-select" onchange="this.form.submit()">
+                    <option selected disabled>--Select Table--</option>
+                    {% for t in tables %}
+                        <option value="{{t}}">{{t}}</option>
+                    {% endfor %}
+                </select> <br>  
+            </div>
+        {% if struct%}
+            {% csrf_token %}
+            <table class="table table-borderless mx-auto" style="max-width: 70%">
+                <thead>
+                    <tr class="text-center">
+                        <th>Column Name</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for n,d in struct.items %}
+                    <tr>
+                        <td class="text-center">{{n}}</td>
+                        <td>
+                            {% if d == "text" %}
+                                <input type="text" class="form-control" name="{{n}}" required> 
+                            {% elif d == "integer" %}
+                                <input type="number" class="form-control" name="{{n}}" required>
+                            {% elif d == "boolean" %}
+                                <select class="form-select" name="{{n}}" required>
+                                    <option value="TRUE">TRUE</option>
+                                    <option value="FALSE">FALSE</option>
+                                </select>
+                            {% elif d == "date" %}
+                                <input type="date" class="form-control" name="{{n}}" required>
+                            {% endif%}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-center"><button class="btn btn-outline-primary py-2 px-4" name="insert"><i class="fa fa-plus"></i> Insert Data</button></div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+<h4 class="text-center">{{d}}</h4>
+{% endblock %}
