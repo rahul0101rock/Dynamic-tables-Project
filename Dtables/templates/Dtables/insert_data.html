@@ -23,14 +23,16 @@ Delete Table
             <table class="table table-borderless mx-auto" style="max-width: 70%">
                 <thead>
                     <tr class="text-center">
-                        <th>Column Name</th>
+                        <th>Column</th>
                         <th>Value</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for n,d in struct.items %}
                     <tr>
-                        <td class="text-center">{{n}}</td>
+                        <td class="text-center">
+                            <div class="{% if n == primary %}text-danger{% endif %}">{{n}}</div>
+                        </td>
                         <td>
                             {% if d == "text" %}
                                 <input type="text" class="form-control" name="{{n}}%{{d}}" required> 
@@ -78,5 +80,6 @@ Delete Table
         </tbody>
     </table>
 </form>
+
 {% endif %}
 {% endblock %}

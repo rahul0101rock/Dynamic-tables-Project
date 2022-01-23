@@ -140,6 +140,9 @@ def insert_data(request):
             for x in cur.fetchall():
                 struct[x[0]]=x[1]
             data["struct"]=struct
+            cur.execute(
+"SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+request.POST["table_name"].lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
+            data["primary"]=cur.fetchall()[0][0]
             cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
             data["data"]= cur.fetchall()
             data["table_name"]=request.POST["table_name"].lower()
