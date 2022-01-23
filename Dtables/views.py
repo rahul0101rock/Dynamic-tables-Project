@@ -20,7 +20,7 @@ def home(request):
         data={}
         try:
             cur = conn.cursor()
-            cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
+            cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
             data["alltables"]= [x[0] for x in cur.fetchall()]
             cur.close()
             conn.commit()
@@ -63,7 +63,7 @@ def create_table(request):
             try:
                 cur = conn.cursor()
                 cur.execute(cq)
-                cur.execute("INSERT INTO alltables (table_name, username) VALUES ('"+request.POST["table_name"].lower()+"', 'NA');")
+                cur.execute("INSERT INTO alltables (table_name, username) VALUES ('"+request.POST["table_name"].lower()+"', '"+request.user.username+"');")
                 cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
                 data["data"]= cur.fetchall()
                 data["data_tablename"]=request.POST["table_name"].lower().title()
@@ -81,7 +81,7 @@ def delete_table(request):
     data={}
     try:
         cur = conn.cursor()
-        cur.execute("SELECT table_name FROM alltables Where username = 'NA';")
+        cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
         tables=[x[0] for x in cur.fetchall()]
         data['tables']=tables
         if request.method == 'POST':
