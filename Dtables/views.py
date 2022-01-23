@@ -153,6 +153,32 @@ def insert_data(request):
         conn.rollback()
     return render(request,'Dtables/insert_data.html',data)
 
+def delete_data(request):
+    data={}
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
+        tables=[x[0] for x in cur.fetchall()]
+        data['tables']=tables
+        if request.method == 'POST': 
+            cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
+            struct={}
+            for x in cur.fetchall():
+                struct[x[0]]=x[1]
+            data["struct"]=struct
+            cur.execute(
+"SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+request.POST["table_name"].lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
+            data["primary"]=cur.fetchall()[0][0]
+            cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
+            data["data"]= cur.fetchall()
+            data["table_name"]=request.POST["table_name"].lower()
+        cur.close()
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        data["error"]=str(error).title()
+        conn.rollback()
+    return render(request,'Dtables/delete_data.html',data)
+
 def user_logout(request):
     log_out(request)
     return_to = urlencode({'returnTo': request.build_absolute_uri('/')})

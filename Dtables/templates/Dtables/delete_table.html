@@ -11,7 +11,8 @@ Delete Table
             {% csrf_token %}
             <div class="row mx-auto" style="max-width: 70%">
                 <div class="h4 text-secondary col-auto ">Table name</div>
-                <select id="tables" name="table_name" class="col form-select">
+                <select id="tables" name="table_name" class="col form-select text-center">
+                    <option selected disabled>--Select Table--</option>
                     {% for t in tables %}
                         <option value="{{t}}">{{t}}</option>
                     {% endfor %}

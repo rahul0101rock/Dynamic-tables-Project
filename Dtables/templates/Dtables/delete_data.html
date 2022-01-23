@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title%}
+Delete Data
+{% endblock %}
+
+{% block content %}
+<div class="card border-secondary mb-3 mx-auto my-5" style="max-width: 75%">
+    <div class="card-header"><h2 class="text-center text-secondary">Delete Data</h2></div>
+    <div class="card-body">
+        <form method ="POST" class="my-2" id="select_table">
+            {% csrf_token %}
+            <div class="row mx-auto" style="max-width: 50%">
+                <div class="h4 text-secondary col-auto ">Table name</div>
+                <select id="tables" name="table_name" class="col form-select text-center" onchange="this.form.submit()">
+                    <option selected disabled>--Select Table--</option>
+                    {% for t in tables %}
+                        <option value="{{t}}" {% if t == table_name %} selected {% endif %}>{{t}}</option>
+                    {% endfor %}
+                </select> <br>  
+            </div>
+    </div>
+</div>
+<h3 class="text-center text-success">{{message}}</h3>
+<h3 class="text-danger text-center">{{error}}</h3>
+{% if data%}
+    <table class="table table-bordered mx-auto" style="max-width: 75%">
+        <thead>
+            <tr class="text-center">
+                {% for n,d in struct.items %}
+                    <th>
+                        {{n}}
+                    </th>
+                {% endfor %}
+                <th>#</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in data %}
+                <tr class="text-center">
+                    {% for c in r %}
+                        <td>{{c}}</td>
+                    {% endfor %}
+                    <td><button class="btn btn-danger" name="delete"><i class="fa fa-trash"></i></button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+{% endif %}
+{% endblock %}
