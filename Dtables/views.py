@@ -111,10 +111,30 @@ def insert_data(request):
         data['tables']=tables
         if request.method == 'POST':
             if 'insert' in request.POST:
-                d=dict(request.POST)
-                d.pop('csrfmiddlewaretoken')
-                d.pop('insert')
-                data['d']=d
+                fdata=dict(request.POST)
+                fdata.pop('csrfmiddlewaretoken')
+                fdata.pop('insert')
+                
+                iq="INSERT INTO "+fdata['table_name'][0]+" VALUES ("
+                fdata.pop('table_name')
+                desc=[]
+                values=[]
+                for c,v in fdata.items():
+                    desc.append(c.split("%")[1])
+                    values.append(v[0])
+                v=[]
+                for i in range(len(values)):
+                    t=""
+                    if not (desc[i]=="boolean" or desc[i]=="integer"):
+                        t+="'"
+                    t+=values[i]
+                    if not (desc[i]=="boolean" or desc[i]=="integer"):
+                        t+="'"
+                    v.append(t)
+                iq+=", ".join(v)
+                iq+=");"
+                cur.execute(iq)
+                data["message"]= "Record Inserted Successfully"   
             cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
             struct={}
             for x in cur.fetchall():
@@ -122,6 +142,7 @@ def insert_data(request):
             data["struct"]=struct
             cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
             data["data"]= cur.fetchall()
+            data["table_name"]=request.POST["table_name"].lower()
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:

@@ -14,7 +14,7 @@ Delete Table
                 <select id="tables" name="table_name" class="col form-select" onchange="this.form.submit()">
                     <option selected disabled>--Select Table--</option>
                     {% for t in tables %}
-                        <option value="{{t}}">{{t}}</option>
+                        <option value="{{t}}" {% if t == table_name %} selected {% endif %}>{{t}}</option>
                     {% endfor %}
                 </select> <br>  
             </div>
@@ -33,16 +33,16 @@ Delete Table
                         <td class="text-center">{{n}}</td>
                         <td>
                             {% if d == "text" %}
-                                <input type="text" class="form-control" name="{{n}}" required> 
+                                <input type="text" class="form-control" name="{{n}}%{{d}}" required> 
                             {% elif d == "integer" %}
-                                <input type="number" class="form-control" name="{{n}}" required>
+                                <input type="number" class="form-control" name="{{n}}%{{d}}" required>
                             {% elif d == "boolean" %}
-                                <select class="form-select" name="{{n}}" required>
+                                <select class="form-select" name="{{n}}%{{d}}" required>
                                     <option value="TRUE">TRUE</option>
                                     <option value="FALSE">FALSE</option>
                                 </select>
                             {% elif d == "date" %}
-                                <input type="date" class="form-control" name="{{n}}" required>
+                                <input type="date" class="form-control" name="{{n}}%{{d}}" required>
                             {% endif%}
                         </td>
                     </tr>
@@ -54,5 +54,29 @@ Delete Table
         {% endif %}
     </div>
 </div>
-<h4 class="text-center">{{d}}</h4>
+<h3 class="text-center text-success">{{message}}</h3>
+<h3 class="text-danger text-center">{{error}}</h3>
+{% if data%}
+    <table class="table table-bordered mx-auto" style="max-width: 75%">
+        <thead>
+            <tr class="text-center">
+                {% for n,d in struct.items %}
+                    <th>
+                        {{n}}
+                    </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in data %}
+                <tr class="text-center">
+                    {% for c in r %}
+                        <td>{{c}}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+{% endif %}
 {% endblock %}
