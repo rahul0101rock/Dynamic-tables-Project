@@ -8,6 +8,7 @@ urlpatterns = [
     path('deletetable/', views.delete_table, name='Delete Table'),
     path('insertdata/', views.insert_data, name='Insert Data'),
     path('deletedata/', views.delete_data, name='Delete Data'),
+    path('table/<table_name>', views.view_table,name='View Table'),
     path('logout/', views.user_logout),
     path('', include('django.contrib.auth.urls')),
     path('', include('social_django.urls')),

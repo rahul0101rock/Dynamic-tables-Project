@@ -14,6 +14,12 @@ Home
     padding-top: 80px;
     font-size:16px;
     }
+.ul {
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
 </style>
 
 {% endblock %}
@@ -45,10 +51,10 @@ Home
                 <div class="card border-secondary mb-3" style="max-width: 100%; height:100%;">
                     <div class="card-header text-center text-primary"><b>View Tables</b></div>
                     <div class="card-body text-secondary">
-                        <ul>
+                        <ul class="ul">
                             {% for t in alltables%}
                                 <li>
-                                    {{t}}
+                                    <a href="/table/{{t}}" title="Click to View Data in {{t}} Table">{{t}}</a>
                                 </li>
                             {% endfor %}
                         </ul>

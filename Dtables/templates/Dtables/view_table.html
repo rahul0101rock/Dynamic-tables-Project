@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title%}
+Table - {{table_name}}
+{% endblock %}
+
+{% block content %}
+<div class="card border-secondary mb-3 mx-auto my-5" style="max-width: 75%">
+    <div class="card-header"><h2 class="text-center text-secondary">{{table_name}}</h2></div>
+    <div class="card-body">
+        {% if data%}
+        <table class="table table-bordered mx-auto">
+            <thead>
+                <tr class="text-center">
+                    {% for n,d in struct.items %}
+                        <th>
+                            {% if n == primary %}
+                                <div class="text-danger">{{n}} ({{d}})</div>   
+                            {% else %}
+                                {{n}} ({{d}})
+                            {% endif %}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in data %}
+                    <tr class="text-center">
+                        {% for c in r %}
+                            <td>{{c}}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+    {% endif %}
+{% endblock %}

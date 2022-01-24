@@ -110,42 +110,43 @@ def insert_data(request):
         tables=[x[0] for x in cur.fetchall()]
         data['tables']=tables
         if request.method == 'POST':
-            if 'insert' in request.POST:
-                fdata=dict(request.POST)
-                fdata.pop('csrfmiddlewaretoken')
-                fdata.pop('insert')
-                
-                iq="INSERT INTO "+fdata['table_name'][0]+" VALUES ("
-                fdata.pop('table_name')
-                desc=[]
-                values=[]
-                for c,v in fdata.items():
-                    desc.append(c.split("%")[1])
-                    values.append(v[0])
-                v=[]
-                for i in range(len(values)):
-                    t=""
-                    if not (desc[i]=="boolean" or desc[i]=="integer"):
-                        t+="'"
-                    t+=values[i]
-                    if not (desc[i]=="boolean" or desc[i]=="integer"):
-                        t+="'"
-                    v.append(t)
-                iq+=", ".join(v)
-                iq+=");"
-                cur.execute(iq)
-                data["message"]= "Record Inserted Successfully"   
-            cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
-            struct={}
-            for x in cur.fetchall():
-                struct[x[0]]=x[1]
-            data["struct"]=struct
-            cur.execute(
-"SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+request.POST["table_name"].lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
-            data["primary"]=cur.fetchall()[0][0]
-            cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
-            data["data"]= cur.fetchall()
-            data["table_name"]=request.POST["table_name"].lower()
+            if request.POST["table_name"].lower() in tables:
+                if 'insert' in request.POST:
+                    fdata=dict(request.POST)
+                    fdata.pop('csrfmiddlewaretoken')
+                    fdata.pop('insert')
+                    
+                    iq="INSERT INTO "+fdata['table_name'][0]+" VALUES ("
+                    fdata.pop('table_name')
+                    desc=[]
+                    values=[]
+                    for c,v in fdata.items():
+                        desc.append(c.split("%")[1])
+                        values.append(v[0])
+                    v=[]
+                    for i in range(len(values)):
+                        t=""
+                        if not (desc[i]=="boolean" or desc[i]=="integer"):
+                            t+="'"
+                        t+=values[i]
+                        if not (desc[i]=="boolean" or desc[i]=="integer"):
+                            t+="'"
+                        v.append(t)
+                    iq+=", ".join(v)
+                    iq+=");"
+                    cur.execute(iq)
+                    data["message"]= "Record Inserted Successfully"   
+                cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
+                struct={}
+                for x in cur.fetchall():
+                    struct[x[0]]=x[1]
+                data["struct"]=struct
+                cur.execute(
+    "SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+request.POST["table_name"].lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
+                data["primary"]=cur.fetchall()[0][0]
+                cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
+                data["data"]= cur.fetchall()
+                data["table_name"]=request.POST["table_name"].lower()
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -160,42 +161,70 @@ def delete_data(request):
         cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
         tables=[x[0] for x in cur.fetchall()]
         data['tables']=tables
-        if request.method == 'POST': 
-            cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
-            struct={}
-            for x in cur.fetchall():
-                struct[x[0]]=x[1]
-            data["struct"]=struct
-            cur.execute(
-"SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+request.POST["table_name"].lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
-            data["primary"]=cur.fetchall()[0][0]
-            cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
-            td=[zip(struct.keys(),x) for x in cur.fetchall()]
-            data["data"]=zip(td,range(len(td)))
-            data["table_name"]=request.POST["table_name"].lower()
-            if "delete" in request.POST:
-                dq="DELETE FROM "+data["table_name"]+" WHERE "
-                for d,i in data["data"]:
-                    if i == int(request.POST["delete"]):
-                        for n,v in d:
-                            if n == data["primary"]:
-                                dq+=n+"="
-                                if type(v) == int:
-                                    dq+=str(v)
-                                else:
-                                    dq+="'"+v+"'"
-                dq+=";"
-                cur.execute(dq)
-                data["message"]="Record Deleted Successfully"
+        if request.method == 'POST':
+            if request.POST["table_name"].lower() in tables: 
+                cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
+                struct={}
+                for x in cur.fetchall():
+                    struct[x[0]]=x[1]
+                data["struct"]=struct
+                cur.execute(
+    "SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+request.POST["table_name"].lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
+                data["primary"]=cur.fetchall()[0][0]
                 cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
                 td=[zip(struct.keys(),x) for x in cur.fetchall()]
                 data["data"]=zip(td,range(len(td)))
+                data["table_name"]=request.POST["table_name"].lower()
+                if "delete" in request.POST:
+                    dq="DELETE FROM "+data["table_name"]+" WHERE "
+                    for d,i in data["data"]:
+                        if i == int(request.POST["delete"]):
+                            for n,v in d:
+                                if n == data["primary"]:
+                                    dq+=n+"="
+                                    if type(v) == int:
+                                        dq+=str(v)
+                                    else:
+                                        dq+="'"+v+"'"
+                    dq+=";"
+                    cur.execute(dq)
+                    data["message"]="Record Deleted Successfully"
+                    cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
+                    td=[zip(struct.keys(),x) for x in cur.fetchall()]
+                    data["data"]=zip(td,range(len(td)))
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
         data["error"]=str(error).title()
         conn.rollback()
     return render(request,'Dtables/delete_data.html',data)
+
+def view_table(request,table_name):
+    data={}
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
+        tables=[x[0] for x in cur.fetchall()]
+        data['tables']=tables
+        if not table_name.lower() in tables:
+            return redirect('/')
+        cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+table_name.lower()+"';")
+        struct={}
+        for x in cur.fetchall():
+            struct[x[0]]=x[1]
+        data["struct"]=struct
+        cur.execute(
+"SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+table_name.lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
+        data["primary"]=cur.fetchall()[0][0]
+        cur.execute("SELECT * FROM "+table_name.lower()+";")
+        data["data"]= cur.fetchall()
+        data["table_name"]=table_name.lower()
+        cur.close()
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        data["error"]=str(error).title()
+        conn.rollback()
+    return render(request,'Dtables/view_table.html',data)
 
 def user_logout(request):
     log_out(request)
