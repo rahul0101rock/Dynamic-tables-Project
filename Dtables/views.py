@@ -186,7 +186,7 @@ def delete_data(request):
                                     dq+="'"+v+"'"
                 dq+=";"
                 cur.execute(dq)
-                data["message"]=dq
+                data["message"]="Record Deleted Successfully"
                 cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
                 td=[zip(struct.keys(),x) for x in cur.fetchall()]
                 data["data"]=zip(td,range(len(td)))
