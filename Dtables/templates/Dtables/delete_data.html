@@ -21,7 +21,7 @@ Delete Data
     </div>
 </div>
 <h3 class="text-center text-success">{{message}}</h3>
-<h3 class="text-danger text-center">{{error}}</h3>
+<h3 class="text-danger text-center">{% if not error == "'Delete'" %}{{error}}{% endif %}</h3>
 {% if data%}
     <table class="table table-bordered mx-auto" style="max-width: 75%">
         <thead>
@@ -35,17 +35,20 @@ Delete Data
             </tr>
         </thead>
         <tbody>
-            {% for r in data %}
+            {% for r,i in data %}
                 <tr class="text-center">
-                    {% for c in r %}
-                        <td>{{c}}</td>
+                    {% for n,c in r %}
+                        <td>
+                        {{c}}
+                        </td>
                     {% endfor %}
-                    <td><button class="btn btn-danger" name="delete"><i class="fa fa-trash"></i></button></td>
+                    <td>
+                        <button class="btn btn-danger" name="delete" value="{{i}}"><i class="fa fa-trash"></i></button>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
 </form>
-
 {% endif %}
 {% endblock %}

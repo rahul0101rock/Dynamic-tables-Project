@@ -170,8 +170,26 @@ def delete_data(request):
 "SELECT c.column_name FROM information_schema.key_column_usage AS c LEFT JOIN information_schema.table_constraints AS t ON t.constraint_name = c.constraint_name WHERE t.table_name = '"+request.POST["table_name"].lower()+"' AND t.constraint_type = 'PRIMARY KEY';")
             data["primary"]=cur.fetchall()[0][0]
             cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
-            data["data"]= cur.fetchall()
+            td=[zip(struct.keys(),x) for x in cur.fetchall()]
+            data["data"]=zip(td,range(len(td)))
             data["table_name"]=request.POST["table_name"].lower()
+            if "delete" in request.POST:
+                dq="DELETE FROM "+data["table_name"]+" WHERE "
+                for d,i in data["data"]:
+                    if i == int(request.POST["delete"]):
+                        for n,v in d:
+                            if n == data["primary"]:
+                                dq+=n+"="
+                                if type(v) == int:
+                                    dq+=str(v)
+                                else:
+                                    dq+="'"+v+"'"
+                dq+=";"
+                cur.execute(dq)
+                data["message"]=dq
+                cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
+                td=[zip(struct.keys(),x) for x in cur.fetchall()]
+                data["data"]=zip(td,range(len(td)))
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
