@@ -8,6 +8,58 @@ Table - {{table_name}}
     <div class="card-header"><h2 class="text-center text-secondary">{{table_name}}</h2></div>
     <div class="card-body">
         {% if data%}
+        <form method="POST" class="mx-auto my-2" style="max-width: 70%;">
+            {% csrf_token %}
+            <div class="row">
+                <select name="column_name" class="col form-select text-center" onchange="this.form.submit()">
+                    <option selected disabled>--Select Column for Filtering Data--</option>
+                    {% for n,d in struct.items %}
+                        <option value="{{n}}%{{d}}" {% if n == col %} selected {% endif %}>
+                                {{n}} ({{d}})
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if col %}
+                    <select name="filter" class="col form-select mx-2">
+                        {% if col_type == "text" %}
+                        <option value="=">Is Equal</option>
+                        <option value="!=">Is Not Equal</option>
+                        <option value="LIKE s">Starts with</option>
+                        <option value="LIKE e">Ends with</option>
+                        <option value="LIKE c">Contains</option>
+                        <option value="LIKE nc">Does Not Contains</option>
+                        <option value="IS NULL">NULL</option>
+                        <option value="IS NOT NULL">Not NULL</option>
+                        {% elif col_type == "integer" %}
+                        <option value=">">Greater than</option>
+                        <option value="<">Less than</option>
+                        <option value="=">Is Equal</option>
+                        <option value="!=">Is Not Equal</option>
+                        <option value="IS NULL">NULL</option>
+                        <option value="IS NOT NULL">Not NULL</option>
+                        {% elif col_type == "boolean" %}
+                        <option value="TRUE">TRUE</option>
+                        <option value="FALSE">FALSE</option>
+                        {% elif col_type == "date" %}
+                        <option value=">">Before</option>
+                        <option value="=">ON</option>
+                        <option value="<">Before</option>
+                        <option value="IS NULL">NULL</option>
+                        <option value="IS NOT NULL">Not NULL</option>
+                        {% endif %}
+                    </select>
+                    {% if col_type == "text" %}
+                        <input type="text" name="value" class="form-control col">
+                    {% elif col_type == "integer" %}
+                        <input type="number" name="value" class="form-control col">
+                    {% elif col_type == "date" %}
+                        <input type="date" name="value" class="form-control col">
+                    {% endif %}
+                    <button class="btn btn-outline-dark col-auto mx-2"><i class="fa fa-filter" ></i></button>
+                {% endif %}
+            </div>
+           
+        </form>
         <table class="table table-bordered mx-auto">
             <thead>
                 <tr class="text-center">

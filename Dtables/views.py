@@ -219,6 +219,8 @@ def view_table(request,table_name):
         cur.execute("SELECT * FROM "+table_name.lower()+";")
         data["data"]= cur.fetchall()
         data["table_name"]=table_name.lower()
+        if request.method == 'POST':
+            data["col"],data["col_type"]=request.POST["column_name"].split("%")
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
