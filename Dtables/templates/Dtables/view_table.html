@@ -7,7 +7,6 @@ Table - {{table_name}}
 <div class="card border-secondary mb-3 mx-auto my-5" style="max-width: 75%">
     <div class="card-header"><h2 class="text-center text-secondary">{{table_name}}</h2></div>
     <div class="card-body">
-        {% if data%}
         <form method="POST" class="mx-auto my-2" style="max-width: 70%;">
             {% csrf_token %}
             <div class="row">
@@ -27,7 +26,7 @@ Table - {{table_name}}
                         <option value="LIKE s">Starts with</option>
                         <option value="LIKE e">Ends with</option>
                         <option value="LIKE c">Contains</option>
-                        <option value="LIKE nc">Does Not Contains</option>
+                        <option value="NOT LIKE c">Does Not Contains</option>
                         <option value="IS NULL">NULL</option>
                         <option value="IS NOT NULL">Not NULL</option>
                         {% elif col_type == "integer" %}
@@ -41,9 +40,9 @@ Table - {{table_name}}
                         <option value="TRUE">TRUE</option>
                         <option value="FALSE">FALSE</option>
                         {% elif col_type == "date" %}
-                        <option value=">">Before</option>
-                        <option value="=">ON</option>
                         <option value="<">Before</option>
+                        <option value="=">ON</option>
+                        <option value=">">After</option>
                         <option value="IS NULL">NULL</option>
                         <option value="IS NOT NULL">Not NULL</option>
                         {% endif %}
@@ -55,7 +54,8 @@ Table - {{table_name}}
                     {% elif col_type == "date" %}
                         <input type="date" name="value" class="form-control col">
                     {% endif %}
-                    <button class="btn btn-outline-dark col-auto mx-2"><i class="fa fa-filter" ></i></button>
+                    <button class="btn btn-outline-dark col-auto mx-2" name="filter_data"><i class="fa fa-filter" ></i></button>
+                    <button class="btn btn-outline-dark col-auto" name="refresh"><i class="fa fa-refresh"></i></button>
                 {% endif %}
             </div>
            
@@ -85,5 +85,8 @@ Table - {{table_name}}
             </tbody>
         </table>
     </form>
-    {% endif %}
+    </div>
+</div>
+    {{fq}}
+    <h3 class="text-danger text-center">{{error}}</h3>
 {% endblock %}

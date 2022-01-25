@@ -1,4 +1,5 @@
 import imp
+from xmlrpc.client import boolean
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as log_out
 from django.conf import settings
@@ -221,6 +222,39 @@ def view_table(request,table_name):
         data["table_name"]=table_name.lower()
         if request.method == 'POST':
             data["col"],data["col_type"]=request.POST["column_name"].split("%")
+            if 'filter_data' in request.POST:
+                fq="SELECT * FROM "+table_name.lower()+" WHERE "+data["col"]+" "
+                valid_q= True
+                fl= request.POST["filter"]
+                if "NULL" in fl: fq+=fl
+                elif data["col_type"]=="boolean":
+                    if fl == "FALSE": fq=fq.replace("WHERE", "WHERE NOT")
+                elif "LIKE" in fl:
+                    if request.POST["value"]:
+                        if "s" in fl: fl=fl[:-1]+"'"+request.POST["value"]+"%'"
+                        elif "e" in fl: fl=fl[:-1]+"'%"+request.POST["value"]+"'"
+                        elif "c" in fl: fl=fl[:-1]+"'%"+request.POST["value"]+"%'"
+                        fq+=fl
+                    else:
+                        data["error"] = "Value Is Required For This Filter"
+                        valid_q = False
+
+                else:
+                    if request.POST["value"]:
+                        fq+=fl+" "
+                        if data["col_type"] == "integer":
+                            fq+=request.POST["value"]
+                        else:
+                            fq+="'"+request.POST["value"]+"'"
+                    else:
+                        data["error"] = "Value Is Required For This Filter"
+                        valid_q = False
+                if valid_q:
+                     cur.execute(fq)
+                     data["data"]=cur.fetchall()
+            elif "refresh" in request.POST:
+                cur.execute("SELECT * FROM "+table_name.lower()+";")
+                data["data"]= cur.fetchall()
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
