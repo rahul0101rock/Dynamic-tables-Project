@@ -28,14 +28,14 @@
         <div class="collapse navbar-collapse" id="navdata">
             <ul class="navbar-nav ms-auto mx-4">
                 {% if user.is_authenticated %}
-                <li class="nav-item mx-2">
-                    <a class="nav-link btn" href="/auditLogs">Audit History <i class=""></i></a>
+                <li class="nav-item">
+                    <a class="nav-link btn" href="/auditLogs" title="Audit Histroy"> <i class="fa fa-history"></i><i class=""></i></a>
                 </li>
                 <li class="nav-item text-white ">
-                    <div class="nav-link btn"><i class="fa fa-user-o"></i> {{ request.user }}</div>
+                    <div class="nav-link btn "><i class="fa fa-user-o"></i> {{ request.user }}</div>
                 </li>
                 
-                <li class="nav-item mx-2">
+                <li class="nav-item">
                     <a class="nav-link btn" href="/logout">Logout <i class="fa fa-sign-out"></i></a>
                 </li>
                 {% else%}

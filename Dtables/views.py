@@ -51,6 +51,8 @@ def create_table(request):
                     cq+=table["n"+k] + " "
                     if table["d"+k]=="String" or table["d"+k]=="Email":
                         cq+="TEXT "
+                        if table["d"+k]=="Email":
+                            cq+="CHECK ("+table["n"+k]+" ~* '^[A-Za-z0-9._%-]+@[A-Za-z0-9.-]+[.][A-Za-z]+$') "
                     elif table["d"+k]=="Number":
                         cq+="INT "
                     elif table["d"+k]=="Boolean":
@@ -66,7 +68,7 @@ def create_table(request):
                 cur = conn.cursor()
                 cur.execute(cq)
                 time = str(datetime.now())
-                logs = "Table - "+request.POST["table_name"].lower() + " created"
+                logs = "Table - "+request.POST["table_name"].lower() + " Created"
                 cur.execute("INSERT INTO alltables (table_name, username) VALUES ('"+request.POST["table_name"].lower()+"', '"+request.user.username+"');")
                 cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
                 cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
@@ -92,7 +94,7 @@ def delete_table(request):
         if request.method == 'POST':
             if request.POST["table_name"].lower() in tables:
                 time = str(datetime.now())
-                logs = "Table - "+request.POST["table_name"].lower() + " deleted"
+                logs = "Table - "+request.POST["table_name"].lower() + " Deleted"
                 cur.execute("DROP TABLE "+request.POST["table_name"].lower()+";")
                 cur.execute("DELETE FROM alltables Where table_name = '"+request.POST["table_name"].lower()+"';")
                 cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
@@ -145,7 +147,7 @@ def insert_data(request):
                     cur.execute(iq)
                     data["message"]= "Record Inserted Successfully"
                     time = str(datetime.now())
-                    logs = "Data inserted into Table - "+request.POST["table_name"].lower()
+                    logs = "Data Inserted into Table - "+request.POST["table_name"].lower()
                     cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
                 cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
                 struct={}
@@ -201,7 +203,7 @@ def delete_data(request):
                     cur.execute(dq)
                     data["message"]="Record Deleted Successfully"
                     time = str(datetime.now())
-                    logs = "Data deleted from Table - "+request.POST["table_name"].lower()
+                    logs = "Data Deleted from Table - "+request.POST["table_name"].lower()
                     cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
                     cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
                     td=[zip(struct.keys(),x) for x in cur.fetchall()]
