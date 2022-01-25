@@ -2,6 +2,7 @@ import imp
 from xmlrpc.client import boolean
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as log_out
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import HttpResponseRedirect, request
 from urllib.parse import urlencode
@@ -33,7 +34,7 @@ def home(request):
     else:
         return render(request,'Dtables/index.html',{})
 
-
+@login_required
 def create_table(request):
     data={}
     no_col=1
@@ -83,7 +84,7 @@ def create_table(request):
     data["range_col"]=range(1,no_col+1)
     data["no_col"]=no_col
     return render(request,'Dtables/create_table.html',data)
-
+@login_required
 def delete_table(request):
     data={}
     try:
@@ -111,7 +112,7 @@ def delete_table(request):
         conn.rollback()
     return render(request,'Dtables/delete_table.html',data)
 
-
+@login_required
 def insert_data(request):
     data={}
     try:
@@ -166,7 +167,7 @@ def insert_data(request):
         data["error"]=str(error).title()
         conn.rollback()
     return render(request,'Dtables/insert_data.html',data)
-
+@login_required
 def delete_data(request):
     data={}
     try:
@@ -215,6 +216,7 @@ def delete_data(request):
         conn.rollback()
     return render(request,'Dtables/delete_data.html',data)
 
+@login_required
 def view_table(request,table_name):
     data={}
     try:
@@ -277,6 +279,7 @@ def view_table(request,table_name):
         conn.rollback()
     return render(request,'Dtables/view_table.html',data)
 
+@login_required
 def audit_logs(request):
     data = {}
     try:
@@ -289,7 +292,8 @@ def audit_logs(request):
         data["error"] = "No Audit History Found"
         conn.rollback()
     return render(request,'Dtables/audit_log.html',data)
-
+    
+@login_required
 def user_logout(request):
     log_out(request)
     return_to = urlencode({'returnTo': request.build_absolute_uri('/')})
