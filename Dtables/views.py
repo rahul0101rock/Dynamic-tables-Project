@@ -3,8 +3,9 @@ from xmlrpc.client import boolean
 from django.shortcuts import render, redirect
 from django.contrib.auth import logout as log_out
 from django.conf import settings
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, request
 from urllib.parse import urlencode
+from datetime import datetime
 import psycopg2
 # Create your views here.
 
@@ -64,7 +65,10 @@ def create_table(request):
             try:
                 cur = conn.cursor()
                 cur.execute(cq)
+                time = str(datetime.now())
+                logs = "Table - "+request.POST["table_name"].lower() + " created"
                 cur.execute("INSERT INTO alltables (table_name, username) VALUES ('"+request.POST["table_name"].lower()+"', '"+request.user.username+"');")
+                cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
                 cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
                 data["data"]= cur.fetchall()
                 data["data_tablename"]=request.POST["table_name"].lower().title()
@@ -87,8 +91,11 @@ def delete_table(request):
         data['tables']=tables
         if request.method == 'POST':
             if request.POST["table_name"].lower() in tables:
+                time = str(datetime.now())
+                logs = "Table - "+request.POST["table_name"].lower() + " deleted"
                 cur.execute("DROP TABLE "+request.POST["table_name"].lower()+";")
                 cur.execute("DELETE FROM alltables Where table_name = '"+request.POST["table_name"].lower()+"';")
+                cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
                 data["message"]='Table "'+request.POST["table_name"].lower().title()+'" Successfully Deleted'
                 cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
                 tables=[x[0] for x in cur.fetchall()]
@@ -136,7 +143,10 @@ def insert_data(request):
                     iq+=", ".join(v)
                     iq+=");"
                     cur.execute(iq)
-                    data["message"]= "Record Inserted Successfully"   
+                    data["message"]= "Record Inserted Successfully"
+                    time = str(datetime.now())
+                    logs = "Data inserted into Table - "+request.POST["table_name"].lower()
+                    cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
                 cur.execute("SELECT column_name,data_type FROM information_schema.columns WHERE table_name = '"+request.POST["table_name"].lower()+"';")
                 struct={}
                 for x in cur.fetchall():
@@ -190,6 +200,9 @@ def delete_data(request):
                     dq+=";"
                     cur.execute(dq)
                     data["message"]="Record Deleted Successfully"
+                    time = str(datetime.now())
+                    logs = "Data deleted from Table - "+request.POST["table_name"].lower()
+                    cur.execute("INSERT INTO auditlogs (username, logs, time) VALUES ('"+request.user.username+"','"+logs+"','"+time+"');")
                     cur.execute("SELECT * FROM "+request.POST["table_name"].lower()+";")
                     td=[zip(struct.keys(),x) for x in cur.fetchall()]
                     data["data"]=zip(td,range(len(td)))
@@ -261,6 +274,19 @@ def view_table(request,table_name):
         data["error"]=str(error).title()
         conn.rollback()
     return render(request,'Dtables/view_table.html',data)
+
+def audit_logs(request):
+    data = {}
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT logs, time FROM auditlogs where username ='"+request.user.username+ "'")
+        data["data"] = cur.fetchall()
+        cur.close()
+        conn.commit()
+    except:
+        data["error"] = "No Audit History Found"
+        conn.rollback()
+    return render(request,'Dtables/audit_log.html',data)
 
 def user_logout(request):
     log_out(request)

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title%}
+Audit Logs
+{% endblock %}
+
+{% block content %}
+
+
+<h3 class="text-danger text-center">{{error}}</h3>
+{% if data%}   
+    <table class="table table-bordered mx-auto" style="max-width: 75%">
+        <thead>
+            <tr class="text-center">
+                
+                    <th>
+                        Logs
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in data %}
+                <tr class="text-center">
+                    {% for c in r %}
+                        <td>{{c}}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</form>
+
+{% endif %}
+{% endblock %}
