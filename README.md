@@ -1,8 +1,6 @@
 # Dynamic-tables-Project
-An App where users can create dynamic tables to collect all user data and manage them
-
-#### Currently Under Development
-#### https://dynamic-tables.herokuapp.com/
+An App Where Users Can Create Dynamic Tables To Collect All User Data And Manage Them
+### https://dynamic-tables.herokuapp.com/
 ## Setup
 
 The first thing to do is to clone the repository:
@@ -27,10 +25,10 @@ Then install the dependencies:
 (myenv)$ pip install -r requirements.txt
 ```
 
-Once `pip` has finished downloading the dependencies:
+Once `pip` has finished installing the dependencies:
 ```sh
 (myenv)$ python manage.py migrate
 (myenv)$ python manage.py runserver
 ```
-And navigate to `http://127.0.0.1:8000/`.
+And navigate to `http://127.0.0.1:8000/` or `http://localhost:8000/`.
 
