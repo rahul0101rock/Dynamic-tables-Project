@@ -24,7 +24,7 @@ def home(request):
         try:
             cur = conn.cursor()
             cur.execute("SELECT table_name FROM alltables Where username = '"+request.user.username+"';")
-            data["alltables"]= [x[0] for x in cur.fetchall()]
+            data["alltables"]= [x[0].title() for x in cur.fetchall()]
             cur.close()
             conn.commit()
         except (Exception, psycopg2.DatabaseError) as error:
@@ -237,7 +237,7 @@ def view_table(request,table_name):
         data["primary"]=cur.fetchall()[0][0]
         cur.execute("SELECT * FROM "+table_name.lower()+";")
         data["data"]= cur.fetchall()
-        data["table_name"]=table_name.lower()
+        data["table_name"]=table_name.title()
         if request.method == 'POST':
             data["col"],data["col_type"]=request.POST["column_name"].split("%")
             if 'filter_data' in request.POST:
