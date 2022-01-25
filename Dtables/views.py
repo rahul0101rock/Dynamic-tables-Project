@@ -142,6 +142,7 @@ def insert_data(request):
                         t+=values[i]
                         if not (desc[i]=="boolean" or desc[i]=="integer"):
                             t+="'"
+                        if t=="''": t="NULL"
                         v.append(t)
                     iq+=", ".join(v)
                     iq+=");"
@@ -292,7 +293,7 @@ def audit_logs(request):
         data["error"] = "No Audit History Found"
         conn.rollback()
     return render(request,'Dtables/audit_log.html',data)
-    
+
 @login_required
 def user_logout(request):
     log_out(request)

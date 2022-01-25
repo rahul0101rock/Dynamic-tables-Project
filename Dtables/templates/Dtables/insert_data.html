@@ -34,16 +34,17 @@ Insert Data
                         </td>
                         <td>
                             {% if d == "text" %}
-                                <input type="text" class="form-control" name="{{n}}%{{d}}" required> 
+                                <input type="text" class="form-control" name="{{n}}%{{d}}" {% if n == primary %} required {% endif %}> 
                             {% elif d == "integer" %}
-                                <input type="number" class="form-control" name="{{n}}%{{d}}" required>
+                                <input type="number" class="form-control" name="{{n}}%{{d}}" {% if n == primary %} required {% endif %}>
                             {% elif d == "boolean" %}
-                                <select class="form-select" name="{{n}}%{{d}}" required>
+                                <select class="form-select text-center" name="{{n}}%{{d}}" {% if n == primary %} required {% endif %}>
+                                    <option selected value="NULL">NULL</option>
                                     <option value="TRUE">TRUE</option>
                                     <option value="FALSE">FALSE</option>
                                 </select>
                             {% elif d == "date" %}
-                                <input type="date" class="form-control" name="{{n}}%{{d}}" required>
+                                <input type="date" class="form-control" name="{{n}}%{{d}}" {% if n == primary %} required {% endif %}>
                             {% endif%}
                         </td>
                     </tr>
@@ -63,7 +64,7 @@ Insert Data
             <tr class="text-center">
                 {% for n,d in struct.items %}
                     <th>
-                        {{n}}
+                        <div class="{% if n == primary %} text-danger {% endif %}">{{n}}</div>                     
                     </th>
                 {% endfor %}
             </tr>

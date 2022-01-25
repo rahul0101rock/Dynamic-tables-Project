@@ -65,11 +65,7 @@ Table - {{table_name}}
                 <tr class="text-center">
                     {% for n,d in struct.items %}
                         <th>
-                            {% if n == primary %}
-                                <div class="text-danger">{{n}} ({{d}})</div>   
-                            {% else %}
-                                {{n}} ({{d}})
-                            {% endif %}
+                            <div class="{% if n == primary %}text-danger{% endif %}">{{n}} <small class="text-secondary fw-lighter">({{d}})</small></div> 
                         </th>
                     {% endfor %}
                 </tr>
